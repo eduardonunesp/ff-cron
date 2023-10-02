@@ -12,6 +12,7 @@ var (
 	appURL    string // APP_URL
 	cronToken string // CRON_TOKEN
 	cronSched string // CRON_SCHED
+	quickRun  bool   // QUICK_RUN
 )
 
 func init() {
@@ -25,6 +26,10 @@ func init() {
 
 	if v, ok := os.LookupEnv("CRON_SCHED"); ok {
 		cronSched = v
+	}
+
+	if v, ok := os.LookupEnv("QUICK_RUN"); ok {
+		quickRun = v == "true"
 	}
 
 	if appURL == "" || cronToken == "" || cronSched == "" {
@@ -44,6 +49,11 @@ func cronJob() {
 }
 
 func main() {
+	if quickRun {
+		cronJob()
+		return
+	}
+
 	c := cron.New()
 	c.AddFunc(cronSched, cronJob)
 	c.Start()
